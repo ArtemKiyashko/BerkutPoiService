@@ -2,6 +2,7 @@
 using BerkutPoiService.Interfaces;
 using BerkutPoiService.Models;
 using GeoHash.NetCore.Utilities.Encoders;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -13,36 +14,44 @@ namespace BerkutPoiService
     {
         private readonly IGeoHashService _geoHashService;
         private readonly IStorageService _storageService;
+        private readonly IRequestValidator _requestValidator;
 
-        public PoiService(IGeoHashService geoHashService, IStorageService storageService)
+        public PoiService(IGeoHashService geoHashService, IStorageService storageService, IRequestValidator requestValidator)
         {
             _geoHashService = geoHashService;
             _storageService = storageService;
+            _requestValidator = requestValidator;
         }
 
         [FunctionName("FindNearestPoint")]
         public async Task<IActionResult> Get(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] [FromQuery] GpsRequest gpsRequest)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req)
         {
-            var geoHash = _geoHashService.ConvertToGeoHash(gpsRequest);
-            var nearestPoint = await _storageService.GetNearestPointAsync(geoHash);
+            //var test = new PointOfInterest
+            //{
+            //    Lat = (decimal)lat,
+            //    Long = (decimal)lon
+            //};
 
-            if (nearestPoint == null)
+            //return new OkObjectResult(test);
+
+            var validationResult = _requestValidator.ValidateCoordinates(req);
+
+            if (!validationResult.IsValid)
+            {
+                return new BadRequestObjectResult(validationResult.ErrorMessage);
+            }
+
+            string geoHash = _geoHashService.ConvertToGeoHash(validationResult.Latitude, validationResult.Longitude);
+
+            PointOfInterest poi = await _storageService.GetNearestPointAsync(geoHash);
+
+            if (poi == null)
             {
                 return new NotFoundResult();
             }
 
-            var decodedCoordinates = _geoHashService.DecodeGeoHash(nearestPoint.GeoHash);
-
-            var response = new
-            {
-                Latitude = decodedCoordinates.Item1,
-                Longitude = decodedCoordinates.Item2,
-                Name = nearestPoint.Name,
-                Content = nearestPoint.Content
-            };
-
-            return new OkObjectResult(response);
+            return new OkObjectResult(poi);
         }
     }
 }
