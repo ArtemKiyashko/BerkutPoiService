@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using BerkutPoiService.Interfaces;
 using BerkutPoiService.Models;
 using GeoHash.NetCore.Utilities.Encoders;
@@ -27,13 +29,6 @@ namespace BerkutPoiService
         public async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req)
         {
-            //var test = new PointOfInterest
-            //{
-            //    Lat = (decimal)lat,
-            //    Long = (decimal)lon
-            //};
-
-            //return new OkObjectResult(test);
 
             var validationResult = _requestValidator.ValidateCoordinates(req);
 
@@ -44,14 +39,14 @@ namespace BerkutPoiService
 
             string geoHash = _geoHashService.ConvertToGeoHash(validationResult.Latitude, validationResult.Longitude);
 
-            PointOfInterest poi = await _storageService.GetNearestPointAsync(geoHash);
+            List<PointOfInterest> pois = await _storageService.GetNearestPointsAsync(geoHash);
 
-            if (poi == null)
+            if (pois == null || !pois.Any())
             {
                 return new NotFoundResult();
             }
 
-            return new OkObjectResult(poi);
+            return new OkObjectResult(pois);
         }
     }
 }

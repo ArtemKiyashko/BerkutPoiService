@@ -9,6 +9,6 @@ namespace BerkutPoiService.Interfaces
 {
     public interface IStorageService
     {
-        Task<PointOfInterest> GetNearestPointAsync(string geoHash);
+        Task<List<PointOfInterest>> GetNearestPointsAsync(string geohash);
     }
 }
