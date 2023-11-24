@@ -17,12 +17,14 @@ namespace BerkutPoiService.Services
         private readonly TableClient _tableClient;
         private readonly string _tableName;
         private readonly int _geoHashSearchLength;
+        private readonly int _partitionKeyLength;
 
         public StorageService(TableServiceClient tableServiceClient, 
             IOptions<StorageServiceOptions> options)
         {
             _tableName = options.Value.TableName;
             _geoHashSearchLength = options.Value.GeoHashSearchLength;
+            _partitionKeyLength = options.Value.GeoHashPartitionKeyLength;
 
             _tableClient = tableServiceClient.GetTableClient(_tableName);
             _tableClient.CreateIfNotExists();
@@ -30,12 +32,22 @@ namespace BerkutPoiService.Services
 
         public async Task<List<PointOfInterest>> GetNearestPointsAsync(string geoHash)
         {
-            var searchGeoHash = geoHash.Substring(0, Math.Min(_geoHashSearchLength, geoHash.Length));
+            var partitionKey = geoHash.Substring(0, Math.Min(_partitionKeyLength, geoHash.Length));
+            string startRowKey = geoHash.Length > _partitionKeyLength 
+                ? geoHash.Substring(_partitionKeyLength, Math.Min(_geoHashSearchLength - _partitionKeyLength, geoHash.Length - _partitionKeyLength)) 
+                : string.Empty;
 
-            string filter = TableQuery.GenerateFilterCondition(
-                "PartitionKey", QueryComparisons.GreaterThanOrEqual, searchGeoHash);
+            string partitionFilter = TableQuery.GenerateFilterCondition(
+                "PartitionKey", QueryComparisons.Equal, partitionKey);
+            string rowKeyFilter = string.IsNullOrEmpty(startRowKey) 
+                ? null 
+                : TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, startRowKey);
 
-            var query = _tableClient.QueryAsync<PointOfInterest>(filter: filter);
+            string combinedFilter = rowKeyFilter != null
+                ? TableQuery.CombineFilters(partitionFilter, TableOperators.And, rowKeyFilter)
+                : partitionFilter;
+
+            var query = _tableClient.QueryAsync<PointOfInterest>(filter: combinedFilter);
 
             var results = new List<PointOfInterest>();
 

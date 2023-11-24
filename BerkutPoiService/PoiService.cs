@@ -41,11 +41,6 @@ namespace BerkutPoiService
 
             List<PointOfInterest> pois = await _storageService.GetNearestPointsAsync(geoHash);
 
-            if (pois == null || !pois.Any())
-            {
-                return new NotFoundResult();
-            }
-
             return new OkObjectResult(pois);
         }
     }
