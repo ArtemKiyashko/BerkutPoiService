@@ -12,5 +12,6 @@ namespace BerkutPoiService.Options
         public string TableName { get; set; }
         public int GeoHashPartitionKeyLength { get; set; }
         public int GeoHashSearchLength { get; set; }
+        public int GeoHashLength { get; set; }
     }
 }
