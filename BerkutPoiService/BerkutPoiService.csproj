@@ -11,6 +11,9 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -18,5 +21,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

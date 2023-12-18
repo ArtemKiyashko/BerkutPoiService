@@ -35,24 +35,11 @@ namespace BerkutPoiService.Services
         public async Task<List<PointOfInterest>> GetNearestPointsAsync(string geoHash)
         {
             var partitionKey = geoHash.Substring(0, Math.Min(_partitionKeyLength, geoHash.Length));
-            string startRowKey = geoHash.Length > _partitionKeyLength 
-                ? geoHash.Substring(_partitionKeyLength, Math.Min(_geoHashSearchLength - _partitionKeyLength, geoHash.Length - _partitionKeyLength)) 
-                : string.Empty;
-            string endRowKey = startRowKey + new string('~', _geoHashLength - startRowKey.Length);
 
             string partitionFilter = TableQuery.GenerateFilterCondition(
                 "PartitionKey", QueryComparisons.Equal, partitionKey);
-            string startRowKeyFilter = TableQuery.GenerateFilterCondition(
-                "RowKey", QueryComparisons.GreaterThanOrEqual, startRowKey);
-            string endRowKeyFilter = TableQuery.GenerateFilterCondition(
-                "RowKey", QueryComparisons.LessThan, endRowKey);
 
-            string combinedFilter = TableQuery.CombineFilters(
-                TableQuery.CombineFilters(partitionFilter, TableOperators.And, startRowKeyFilter),
-                TableOperators.And,
-                endRowKeyFilter);
-
-            var query = _tableClient.QueryAsync<PointOfInterest>(filter: combinedFilter);
+            var query = _tableClient.QueryAsync<PointOfInterest>(filter: partitionFilter);
 
             var results = new List<PointOfInterest>();
 

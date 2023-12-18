@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BerkutPoiService.Interfaces;
 using BerkutPoiService.Models;
-using GeoHash.NetCore.Utilities.Encoders;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
