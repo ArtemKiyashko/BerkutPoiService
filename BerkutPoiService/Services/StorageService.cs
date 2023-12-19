@@ -61,5 +61,10 @@ namespace BerkutPoiService.Services
 
             return results;
         }
+
+        public async Task AddPointOfInterestAsync(PointOfInterest poi)
+        {
+            await _tableClient.AddEntityAsync(poi);
+        }
     }
 }
