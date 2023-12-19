@@ -1,4 +1,5 @@
-﻿using Azure.Identity;
+﻿using System.IO;
+using Azure.Identity;
 using BerkutPoiService.Interfaces;
 using BerkutPoiService.Manager;
 using BerkutPoiService.Options;
@@ -7,11 +8,6 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 [assembly: FunctionsStartup(typeof(BerkutPoiService.Startup))]
 namespace BerkutPoiService
@@ -23,6 +19,7 @@ namespace BerkutPoiService
         public override void Configure(IFunctionsHostBuilder builder)
         {
             _functionConfig = new ConfigurationBuilder()
+                .AddJsonFile(Path.Combine(builder.GetContext().ApplicationRootPath, "appsettings.json"))
                 .AddEnvironmentVariables()
                 .Build();
 

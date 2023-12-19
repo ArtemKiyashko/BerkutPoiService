@@ -1,12 +1,7 @@
-﻿using BerkutPoiService.Interfaces;
+﻿using System.Globalization;
+using BerkutPoiService.Interfaces;
 using BerkutPoiService.Models;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BerkutPoiService.Manager
 {
@@ -26,7 +21,7 @@ namespace BerkutPoiService.Manager
             string latStr = req.Query["lat"];
             string longStr = req.Query["long"];
 
-            if (!double.TryParse(latStr, out double lat) || !double.TryParse(longStr, out double lon))
+            if (!double.TryParse(latStr, NumberStyles.Number, CultureInfo.InvariantCulture, out double lat) || !double.TryParse(longStr, NumberStyles.Number, CultureInfo.InvariantCulture, out double lon))
             {
                 result.IsValid = false;
                 result.ErrorMessage = "Invalid format for coordinates";

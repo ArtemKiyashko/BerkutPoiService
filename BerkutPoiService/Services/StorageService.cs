@@ -6,8 +6,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BerkutPoiService.Services
@@ -20,7 +18,7 @@ namespace BerkutPoiService.Services
         private readonly int _partitionKeyLength;
         private readonly int _geoHashLength;
 
-        public StorageService(TableServiceClient tableServiceClient, 
+        public StorageService(TableServiceClient tableServiceClient,
             IOptions<StorageServiceOptions> options)
         {
             _tableName = options.Value.TableName;
@@ -35,8 +33,8 @@ namespace BerkutPoiService.Services
         public async Task<List<PointOfInterest>> GetNearestPointsAsync(string geoHash)
         {
             var partitionKey = geoHash.Substring(0, Math.Min(_partitionKeyLength, geoHash.Length));
-            string startRowKey = geoHash.Length > _partitionKeyLength 
-                ? geoHash.Substring(_partitionKeyLength, Math.Min(_geoHashSearchLength - _partitionKeyLength, geoHash.Length - _partitionKeyLength)) 
+            string startRowKey = geoHash.Length > _partitionKeyLength
+                ? geoHash.Substring(_partitionKeyLength, Math.Min(_geoHashSearchLength - _partitionKeyLength, geoHash.Length - _partitionKeyLength))
                 : string.Empty;
             string endRowKey = startRowKey + new string('~', _geoHashLength - startRowKey.Length);
 
@@ -62,6 +60,11 @@ namespace BerkutPoiService.Services
             }
 
             return results;
+        }
+
+        public async Task AddPointOfInterestAsync(PointOfInterest poi)
+        {
+            await _tableClient.AddEntityAsync(poi);
         }
     }
 }
