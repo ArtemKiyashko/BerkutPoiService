@@ -4,7 +4,15 @@
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- main
+  batch: true
+  branches:
+    include:
+      - main
+pr:
+  branches:
+    include:
+      - develop
+
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
@@ -53,7 +61,7 @@ stages:
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
   jobs:
   - deployment: Deploy
