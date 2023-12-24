@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BerkutPoiService.Models
 {
-    public class PoiRequest
+    public class PoiSaveRequest
     {
         [Required]
         [Range(-90, 90, ErrorMessage = "Latitude must be between -90 and 90.")]

@@ -50,14 +50,16 @@ namespace BerkutPoiService
         }
 
         [FunctionName("AddPointOfInterest")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req)
+        public async Task<IActionResult> Save(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] PoiSaveRequest poiRequest)
         {
+            if (poiRequest == null)
+            {
+                return new BadRequestObjectResult("Invalid request data.");
+            }
+
             try
             {
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var poiRequest = JsonConvert.DeserializeObject<PoiRequest>(requestBody);
-
                 if (poiRequest.Lat == null || poiRequest.Long == null)
                 {
                     return new BadRequestObjectResult("Latitude and Longitude are required.");
