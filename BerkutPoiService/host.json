@@ -6,7 +6,9 @@
                 "isEnabled": true,
                 "excludedTypes": "Request"
             },
-            "enableLiveMetricsFilters": true
+            "snapshotConfiguration": {
+                "isEnabled": true
+            }
         }
     }
 }
