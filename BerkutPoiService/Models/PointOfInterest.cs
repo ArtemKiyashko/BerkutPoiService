@@ -16,5 +16,6 @@ namespace BerkutPoiService.Models
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
         public string Assets { get; set; }
+        public bool Disabled { get; set; }
     }
 }
