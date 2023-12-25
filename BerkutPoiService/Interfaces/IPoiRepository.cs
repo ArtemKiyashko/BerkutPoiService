@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 
 namespace BerkutPoiService.Interfaces
 {
-    public interface IStorageService
-    {
-        Task<List<PoiResponse>> GetNearestPointsAsync(double latitude, double longitude);
+	public interface IPoiRepository
+	{
+        Task<List<PoiResponse>> GetNearestPointsAsync(string geoHash);
         Task AddPointOfInterestAsync(PoiSaveRequest poiSaveRequest);
     }
 }
+

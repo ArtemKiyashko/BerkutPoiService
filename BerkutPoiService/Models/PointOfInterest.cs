@@ -15,5 +15,6 @@ namespace BerkutPoiService.Models
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
+        public string Assets { get; set; }
     }
 }

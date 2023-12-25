@@ -3,6 +3,7 @@ using Azure.Identity;
 using BerkutPoiService.Interfaces;
 using BerkutPoiService.Manager;
 using BerkutPoiService.Options;
+using BerkutPoiService.Repositories;
 using BerkutPoiService.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Azure;
@@ -30,12 +31,15 @@ namespace BerkutPoiService
             builder.Services.AddScoped<IGeoHashService, GeoHashService>();
             builder.Services.AddScoped<IStorageService, StorageService>();
             builder.Services.AddScoped<IRequestValidator, RequestValidator>();
+            builder.Services.AddScoped<IPoiRepository, PoiRepository>();
 
             builder.Services.AddAzureClients(clientBuilder =>
             {
                 clientBuilder.UseCredential(new DefaultAzureCredential());
                 clientBuilder.AddTableServiceClient(_storageServiceOptions.StorageAccountConnectionString);
             });
+
+            builder.Services.AddAutoMapper(typeof(Startup));
         }
     }
 }
