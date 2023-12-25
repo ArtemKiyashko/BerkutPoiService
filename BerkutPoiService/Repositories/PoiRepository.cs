@@ -49,11 +49,14 @@ namespace BerkutPoiService.Repositories
                 "RowKey", QueryComparisons.GreaterThanOrEqual, startRowKey);
             string endRowKeyFilter = TableQuery.GenerateFilterCondition(
                 "RowKey", QueryComparisons.LessThan, endRowKey);
+            string disabledFilter = "Disabled eq false";
 
             string combinedFilter = TableQuery.CombineFilters(
-                TableQuery.CombineFilters(partitionFilter, TableOperators.And, startRowKeyFilter),
+                TableQuery.CombineFilters(
+                    TableQuery.CombineFilters(partitionFilter, TableOperators.And, startRowKeyFilter),
+                    TableOperators.And, endRowKeyFilter),
                 TableOperators.And,
-                endRowKeyFilter);
+                disabledFilter);
 
             var query = _tableClient.QueryAsync<PointOfInterest>(filter: combinedFilter);
 
